@@ -1,4 +1,4 @@
-![Task19 Logo](images/Task 19_banner A_text.png)
+![Task19 Logo](images/task19_banner_a_text.png)
 
 # Task19 Ice Loss Method
 

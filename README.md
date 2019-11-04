@@ -1,6 +1,3 @@
-# t19code
-test repo to clean the local repo of all mentions of past customers
-
 # Task19 Ice Loss Method
 
 A standardized method to assess production losses due to icing from wind turbine SCADA data. This site describes a method to assess production losses due to icing based on standard SCADA data available from modern wind turbines.

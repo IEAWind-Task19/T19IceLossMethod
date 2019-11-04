@@ -12,9 +12,11 @@ Code is written in Python 3 and it uses several libraries included in the Scipy 
 
 Needed libraries are: ::
     
-    numpy, scipy, matplotlib
+    numpy, scipy, matplotlib, (sphinx)
 
 Information on installing the scipy stack can be found from `the Scipy website <http://www.scipy.org/install.html>`_
+
+Sphinx is needed to build the documentation. It's not mandatory, the release package includes a compiled documentation.
 
 Note that you will need python 3 versions of the libraries.
 

@@ -61,8 +61,8 @@ Air density is to be corrected to hub height according to ISO 2533 by scaling th
 
 .. math::
 
-  w_{site} = w_{std} \cdot  \left ( \frac{\rho_{std}}{\rho_{site}} \right )^{\frac{1}{3}} = w_{std} \cdot \left ( \frac{\frac{P_{std}}{T_{std}}}{\frac{P_{site}}{T_{site}}} \right )^{\frac{1}{3}} \\
-  w_{site} = w_{std} \cdot \left ( \frac{T_{std}}{T_{site}}(1-2.25577 \cdot 10^{-5} \cdot h)^{5.25588} \right )^{\frac{1}{3}}
+  w_{site} = w_{std} \times  \left ( \frac{\rho_{std}}{\rho_{site}} \right )^{\frac{1}{3}} = w_{std} \times \left ( \frac{\frac{P_{std}}{T_{std}}}{\frac{P_{site}}{T_{site}}} \right )^{\frac{1}{3}} \\
+  w_{site} = w_{std} \times \left ( \frac{T_{std}}{T_{site}}(1-2.25577 \times 10^{-5} \times h)^{5.25588} \right )^{\frac{1}{3}}
 
 where w\ :sub:`site` is calibrated nacelle wind speed, w\ :sub:`std` measured nacelle wind speed, T\ :sub:`site` is nacelle
 temperature [#f3]_ and T\ :sub:`std` is standard temperature of 15°C (288.15 K) resulting to air density of 1.225
@@ -72,7 +72,7 @@ level [#f4]_.
 The IEC 61400-12-1 “Power performance measurements” is applicable for very detailed power production calculations using a standard met mast wind measurements as input. However, the method for production loss calculation using SCADA data only results to using nacelle top wind measurements which are disturbed by the rotating rotor. The nacelle anemometer is thus less accurate and simplified binning of the reference data is proposed. As a first step, reference turbine data needs to be temperature and air pressure corrected and filtered according to production mode [#f5]_ as follows:
 
 * air density and static air pressure correction with nacelle temperature and site elevation
-* power production operating states only AND temperature [#f6]_ ≥ +3°C
+* power production operating states only AND temperature [#f6]_ > +3°C
 
 For power curve calculation the data is binned according to wind speed and optionally according to wind direction as well. Usefulness of wind direction-based binning depends on the site geography and is not always necessary. A separate power curve is then calculated for each wind direction bin.
 
@@ -114,11 +114,11 @@ Icing event class a)
 The start of a typical reduced power output icing event class a) [IEa] for an operational turbine is
 defined as follows:
 
-* If temp is below 0°C AND power is below 10th percentile of the respective reference (non-iced) wind bin for 30 minutes or more, THEN icing event class a) starts
+    If temp is below 0°C AND power is below 10th percentile of the respective reference (non-iced) wind bin for 30 minutes or more, THEN icing event class a) starts
 
 An icing event class a) ends as follows:
 
-* If power is above 10th percentile of the respective reference wind bin for 30-min or more, THEN icing event class a) ends
+    If power is above 10th percentile of the respective reference wind bin for 30-min or more, THEN icing event class a) ends
 
 In the output files icing event class a is referenced as `Production losses due to icing`
 
@@ -129,10 +129,11 @@ Icing event class b)
 Icing can cause the turbine to shut-down and cause the turbine to standstill for a number of reasons.
 Standstill due to icing caused by icing event class b) [IEb] begins as follows:
 
-* If temp is below 0°C AND power is below 10th percentile of the respective reference wind bin for 10-min resulting to a shutdown (power < 0.5 % of rated power of the turbine for at least 20-min, THEN standstill due to icing starts
+    If temp is below 0°C AND power is below 10th percentile of the respective reference wind bin for 10-min resulting to a shutdown (power < 0.5 % of rated power of the turbine for at least 20-min, THEN standstill due to icing starts
 
 Icing event b) ends as follows:
-· If power is above 10th percentile of the respective reference wind bin for 30-min or more, THEN icing event class b) ends
+
+    If power is above 10th percentile of the respective reference wind bin for 30-min or more, THEN icing event class b) ends
 
 -------------------------------------------
 Manual analysis of shut-downs in wintertime
@@ -151,10 +152,12 @@ Icing event class c)
 The heated anemometer ws may sometimes be influenced by ice resulting to overproduction.
 The start of an overproduction (iced up anemometer) icing event class c) [IEc] for an operational turbine
 is as follows:
-* If temp is below 0°C AND power is above 90th percentile of the respective reference wind bin for 30-min or more, THEN icing event class c) starts
+
+    If temp is below 0°C AND power is above 90th percentile of the respective reference wind bin for 30-min or more, THEN icing event class c) starts
 
 Icing event class c) ends as follows:
-* If power is below 90th percentile of the respective reference wind bin for 30-min or more, THEN icing event class c) ends
+
+    If power is below 90th percentile of the respective reference wind bin for 30-min or more, THEN icing event class c) ends
 
 For IEa and IEb, the production losses can be defined. However, if the measured output power is above expected wind speed (ie overproducing) in IEc, there is reason to expect the anemometer is influenced by ice and for this case, the production losses cannot be defined unless accurate wind speed are available from another source. If the number of hours with IEc is large, the estimated total production losses can be considered as minimum losses because all icing influences cannot be assessed.
 
@@ -168,8 +171,8 @@ The output of the method and the formatting of the results are described in the 
 
 
 .. [#f2] Alternatively, detailed weather model air pressure values can used. Of course if air pressure is measured, that is the preferred alternative
-.. [#f3] Warning: Some nacelle temperature sensors have shown a constant bias of +2…3 °C due to radiation heat ofnacelle. Investigating this bias is recommended (compare to met mast, weather models etc)
+.. [#f3] Warning: Some nacelle temperature sensors have shown a constant bias of +2...3 °C due to radiation heat of nacelle. Investigating this bias is recommended (compare to met mast, weather models etc)
 .. [#f4] Engineering ToolBox, (2003). Altitude above Sea Level and Air Pressure. [online] Available at: https://www.engineeringtoolbox.com/air-altitude-pressure-d_462.html
-.. [#f5] Alternatively, if controller mode is not available or known, use following filter criterias: IF P\ :sub:`min` > 0.005 ∙ P\ :sub:`rated` AND P\ :sub:`mean` > 0.05 ∙ P\ :sub:`rated` THEN Power production mode = normal
+.. [#f5] Alternatively, if controller mode is not available or known, use following filter criterias: IF P\ :sub:`min` > 0.005  P\ :sub:`rated` AND P\ :sub:`mean` > 0.05  P\ :sub:`rated` THEN Power production mode = normal
 .. [#f6] This temperature limit needs to be set high enough to assume that turbine is not influenced by icing at these temperatures
 

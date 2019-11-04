@@ -1,3 +1,5 @@
+![Task19 Logo](images/Task 19_banner A_text.png)
+
 # Task19 Ice Loss Method
 
 A standardized method to assess production losses due to icing from wind turbine SCADA data. This site describes a method to assess production losses due to icing based on standard SCADA data available from modern wind turbines.
@@ -14,7 +16,8 @@ With the method described here, anyone with access to SCADA data from wind turbi
 
 # Method
 
-Task 19 proposes a method that is robust, easily adaptable, filters outliers automatically and does not assume a normal distribution of the SCADA data for individual turbines and wind farms. The proposed method uses percentiles of the reference, non-iced power curve in combination with temperature measurements. Ice build-up on turbine blades gradually deteriorates the power output (or results to overproduction to iced anemometer) so for increased accuracy the method uses three consecutive 10-minute data points for defining start-stop timestamps for icing events. In other words, the turbine rotor is used as an ice detector. Iced turbine power losses are defined by comparing the performance to the calculated power curve using heated anemometers from nacelle and the measured reference, expected power curve. Production losses are separated into 2 categories: operation and standstill losses due to icing.
+Task 19 proposes a method that is robust, easily adaptable, filters outliers automatically and does not assume a normal distribution of the SCADA data for individual turbines and wind farms. The proposed method uses percentiles of the reference, non-iced power curve in combination with temperature measurements. Ice build-up on turbine blades gradually deteriorates the power output (or results to overproduction to iced anemometer) so for increased accuracy the method uses three consecutive 10-minute data points for defining start-stop timestamps for icing events. In other words, the turbine rotor is used as an ice detector. Iced turbine power losses are defined by comparing the performance to the calculated power curve using heated anemometers from nacelle and the measured reference, expected power curve. Production losses are separated into 2 categories: operation and standstill losses due to icing. The different icing event cases are illustrated in the picture below: Event class A, reduced production due to icing, Event Class B, turbine stops due to icing and event class C, apparent overproduction due to icing.
+![Iceing event examples](images/power_curve_example.PNG) 
 
 On a general level, the method can be divided into 3 main steps:
 
@@ -30,6 +33,15 @@ ws | Hub height wind speed | m/s | 10-minute mean
 temp | Ambient temperature (hub height) | °C | 10-minute mean
 pwr mean | Turbine output power | kW | 10-minute mean
 mode | Turbine operational mode | - | 10-minute mean
+
+# Usage
+
+The production loss calculator is configured by setting up a config file. Then calling the script ``t19_counter.py`` by giving the ini file as a command line parameter as :
+
+    python t19_counter.py site.ini
+
+where ``site.ini`` contains the case definition relevant for your site. See the included documentation for more details on how to set up the .ini file.
+
 
 
 # IEA Wind

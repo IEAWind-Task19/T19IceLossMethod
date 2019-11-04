@@ -1,0 +1,44 @@
+CHANGELOG:
+
+v 3.0: 2019- xxx
+
+* Added a stop code to the code
+    * Stop code can be used to highlight icing caused stops if there is a separate status code in scada for that.
+* Fixed datatype issues with newr versions of numpy
+* Added IPS handling capability to loss counter
+* Added Power curve uncertainty to power curves:
+    * uncertainty defined as std_dev/mean
+* Added Status code based stops as a separate case for output
+    * Allows counting production losses during a certain status code
+* Added IPS and status code stops to summary file
+* Added power curve uncertainty to summary file and printed power curve
+* Time Based Availability and Energy Based Availability
+* Icing losses now counted against actual production instead of theoretical reference
+
+
+
+v 2.0: 2017-04-04
+
+* Changed power curve from mean to P50
+* fixed bug in air density correction
+* fixed bug in production statistics
+* separated the temperature level filters
+    * different filter levels for building the reference dataset and ice detection
+* reformatted the summary summary
+* added an example input file that works
+* included example case results in the release package
+
+v. 1.1: 2015-11-27 11:25 
+
+* fixed a crash with zero output
+* Added new filtering options
+    * adjustable power level filter
+    * adjustable temperature level filter
+    * custom start and stop times
+* fixed issues with time stamp indexing
+    * no longer assumes timestamps to be at column 0
+
+v. 1.0
+
+Initial public release
+

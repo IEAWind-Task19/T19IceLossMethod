@@ -1,0 +1,14 @@
+######################################################
+Class Documentation for the Task 19 power loss counter
+######################################################
+
+.. automodule:: t19_ice_loss
+
+.. autoclass:: AEPcounter
+    :members:
+    
+.. autoclass:: CSVimporter
+    :members:
+    
+.. autoclass:: Result_file_writer
+    :members:

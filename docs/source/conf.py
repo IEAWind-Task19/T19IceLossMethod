@@ -18,10 +18,10 @@ sys.path.append(os.path.join(os.path.dirname(__name__), '../'))
 
 project = 'Task 19 Ice Loss'
 copyright = '2019, IEA Wind Task 19'
-author = 'Timo Karlsso/VTT'
+author = 'IEA Wind Task 19'
 
 # The full version, including alpha/beta/rc tags
-release = '3.0'
+release = '2.2'
 
 
 # -- General configuration ---------------------------------------------------

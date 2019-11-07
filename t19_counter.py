@@ -126,23 +126,23 @@ def main(configfile_name):
     #new_pc = aepc.count_power_curves(new_ref)
 
     rfw = dfh.Result_file_writer()
+    rfw.set_output_file_options(configfile_name)
 
-    if config.getboolean('Output', 'summary'):
+    if rfw.summaryfile_write:
         summary_status, summary_filename, summary_error = rfw.summary_statistics(aepc, time_limited_data, pc, alarm_timings, stop_timings, over_timings, status_timings, ice_timings, ips_timings, data_sizes)
         if summary_status:
             print("{0} : Summary written successfully into: {1}".format(dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), summary_filename))
         else:
             print("{0} : Problem writing summary: {1}".format(dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), summary_error))
 
-
-    if config.getboolean('Output', 'power curve'):
+    if rfw.power_curve_write:
         power_curve_status, pc_filename, pc_error = rfw.write_power_curve(aepc,pc)
         if power_curve_status:
             print('{0} : Power curve written successfully into: {1}'.format(dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), pc_filename))
         else:
             print('{0} : Problem writing power curve: {1}'.format(dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), pc_error))
 
-    if config.getboolean('Output', 'icing events'):
+    if rfw.icing_events_write:
         # TODO: write these to one file
         prod_loss_trunk = '_losses.csv'
         stops_trunk = '_stops.csv'
@@ -183,14 +183,14 @@ def main(configfile_name):
             else:
                 print('{0} : Error writing Status Code statistics: {1}'.format(dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), icing_write_error))
 
-        #TODO: make ice detector and IPS OPTIONAL
+        #TODO: make ice detector and IPS OPTIONAL, Now the code inserts dummy values for IPS. Not a clean solution
         monthly_stat_status, stat_filename, stat_write_error = rfw.write_monthly_stats(time_limited_data, pc, aepc, pow_alms1, stops, status_stops, ips_on_flags, ice_detected)
         if monthly_stat_status:
             print('{0} : Monthly icing loss timeseries written into: {1}'.format(dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), stat_filename))
         else:
             print('{0} : Error writing loss timeseries: {1}'.format(dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), stat_write_error))
 
-    if config.getboolean('Output', 'alarm time series'):
+    if rfw.alarm_time_series_file_write:
         # write out the results
         combined_ts = aepc.combine_timeseries(pow_alms1,stops,pow_alms2)
         alarm_timeseries_filename = aepc.result_dir + aepc.id + '_alarms.csv'
@@ -200,7 +200,7 @@ def main(configfile_name):
         else:
             print('{0} : Error writing time series file: {1}'.format(dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), ts_write_error))
 
-    if config.getboolean('Output','filtered raw data'):
+    if rfw.filtered_raw_data_write:
         filtered_data_filename = aepc.result_dir + aepc.id + '_filtered.csv'
         new_data = rfw.insert_fault_codes(aepc.time_filter_data(temperature_corrected_data), aepc, reader)
         raw_write_status, raw_write_error = rfw.write_time_series_file(filtered_data_filename, new_data, headers,aepc,pc)
@@ -209,8 +209,7 @@ def main(configfile_name):
         else:
             print('{0} : Error writeing raw data: {1}'.format(dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S'),raw_write_error))
 
-
-    if config.getboolean('Output', 'plot'):
+    if rfw.pc_plot_picture:
         if aepc.heated_site:
             rfw.generate_standard_plots(temperature_corrected_data, pc, aepc, pow_alms1, pow_alms2, stops, data_sizes,
                                         alarm_timings, over_timings, stop_timings, ips_on_flags, True)

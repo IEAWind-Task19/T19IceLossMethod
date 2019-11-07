@@ -52,43 +52,43 @@ Example input data
 
 Below is an example of what input data could look like. Notice the Status and fault code columns on the right. In this case there needs to be additional filtering to replace the status and fault codes with numerical values.
 
-=================   =======================   ========   ==============   =========   =================   =========   =============
-Time stamp (0)      Ambient temperature (1)   RPM(2)     Wind Speed (3)   Power(4)    Wind Direction(5)   Status(6)   Fault code(7) 
-=================   =======================   ========   ==============   =========   =================   =========   =============
-2013-02-01 17:20    -3.1441                   10.2057    7.5988           1277.235    133.3394495         Run         OK           
-2013-02-01 17:30    -3.803                    10.8446    7.6623           1235.741    132.1192661         Run         OK           
-2013-02-01 17:40    -3.2372                   10.9097    7.5914           1297.725    134.3853211         Run         OK           
-2013-02-01 17:50    -3.5766                   10.5399    7.9407           1227.176    130.9174312         Run         OK           
-2013-02-01 18:00    -3.7936                   10.9371    7.8154           1256.481    132.9724771         Run         OK           
-2013-02-01 18:10    -3.7363                   10.9323    7.6261           1274.133    132.440367          Run         OK           
-2013-02-01 18:20    -3.6341                   10.8217    7.3955           1249.529    136.7155963         Run         OK           
-2013-02-01 18:30    -3.877                    10.9305    7.691            1232.532    137.1100917         Run         OK           
-2013-02-01 18:40    -3.2923                   10.3082    7.7816           1270.953    135.7155963         Run         OK           
-2013-02-01 18:50    -3.5217                   10.6347    7.9739           1299.535    135.6422018         Run         OK           
-2013-02-01 19:00    -3.1502                   10.9032    7.3878           1221.514    131.4220183         Run         OK           
-2013-02-01 19:10    -3.3434                   10.9328    7.8072           1256.669    131.7981651         Run         OK           
-2013-02-01 19:20    -3.1546                   10.8758    7.7349           1284.479    134.8990826         Run         OK           
-2013-02-01 19:30    -3.087                    10.3726    7.8621           1288.962    135.2844037         Run         OK           
-2013-02-01 19:40    -3.1371                   10.7288    7.4672           1230.259    133.4678899         Run         OK           
-2013-02-01 19:50    -3.4897                   10.9457    7.509            1279.426    138.9082569         Run         OK           
-2013-02-01 20:00    -3.344                    10.5737    7.9378           1239.045    139.1376147         Run         OK           
-2013-02-01 20:10    -3.0244                   10.3775    7.1774           1273.976    132.293578          Run         OK           
-2013-02-01 20:20    -3.5071                   10.5408    7.3004           1254.343    136.9541284         Run         OK           
-2013-02-01 20:30    -3.4755                   10.7316    7.7331           1278.701    131.5137615         Run         OK           
-2013-02-01 20:40    -3.5339                   10.7755    7.6289           1269.522    134.0642202         Run         OK           
-2013-02-01 20:50    -3.0432                   10.1932    7.0893           1296.482    135.8256881         Run         OK           
-2013-02-01 21:00    -3.3124                   10.7217    7.8652           1278.775    133.1834862         Run         OK           
-2013-02-01 21:10    -3.4466                   10.7538    7.6277           1232.615    134.559633          Run         OK           
-2013-02-01 21:20    -3.4688                   10.5178    7.9821           1219.4      135.8899083         Run         OK           
-2013-02-01 21:30    -3.8004                   10.7848    7.5614           1280.438    132.3486239         Run         OK           
-2013-02-01 21:40    -3.26                     10.7713    7.2718           1253.659    136.6880734         Run         OK           
-2013-02-01 21:50    -3.7505                   10.5144    7.6549           0           137.6513761         Fault       Fault code A 
-2013-02-01 22:00    -3.1515                   10.8939    7.6856           0           133.5045872         Fault       Fault code A 
-2013-02-01 22:10    -3.8964                   10.722     7.8238           0           135.3394495         Fault       Fault code A 
-2013-02-01 22:20    -3.8023                   10.4324    7.1408           0           133.3761468         Fault       Fault code A 
-2013-02-01 22:30    -3.8611                   10.4906    7.1721           0           133.7155963         Fault       Fault code A 
-2013-02-01 22:40    -3.0412                   10.1144    7.6194           0           136.9908257         Fault       Fault code A 
-=================   =======================   ========   ==============   =========   =================   =========   =============
+=================   ===============   ========   ===============   =========   ============   =========   =============
+Time stamp (0)      Temperature (1)   RPM (2)     Wind Speed (3)   Power(4)    Direction(5)   Status(6)   Fault code(7)
+=================   ===============   ========   ===============   =========   ============   =========   =============
+2013-02-01 17:20    -3.14             10.2       7.5988            1277.235    133            Run         OK
+2013-02-01 17:30    -3.80             10.8       7.6623            1235.741    132            Run         OK
+2013-02-01 17:40    -3.23             10.9       7.5914            1297.725    134            Run         OK
+2013-02-01 17:50    -3.57             10.5       7.9407            1227.176    130            Run         OK
+2013-02-01 18:00    -3.79             10.9       7.8154            1256.481    132            Run         OK
+2013-02-01 18:10    -3.73             10.9       7.6261            1274.133    132            Run         OK
+2013-02-01 18:20    -3.63             10.8       7.3955            1249.529    136            Run         OK
+2013-02-01 18:30    -3.87             10.9       7.691             1232.532    137            Run         OK
+2013-02-01 18:40    -3.29             10.3       7.7816            1270.953    135            Run         OK
+2013-02-01 18:50    -3.52             10.6       7.9739            1299.535    135            Run         OK
+2013-02-01 19:00    -3.15             10.9       7.3878            1221.514    131            Run         OK
+2013-02-01 19:10    -3.34             10.9       7.8072            1256.669    131            Run         OK
+2013-02-01 19:20    -3.15             10.8       7.7349            1284.479    134            Run         OK
+2013-02-01 19:30    -3.08             10.3       7.8621            1288.962    135            Run         OK
+2013-02-01 19:40    -3.13             10.7       7.4672            1230.259    133            Run         OK
+2013-02-01 19:50    -3.48             10.9       7.509             1279.426    138            Run         OK
+2013-02-01 20:00    -3.34             10.5       7.9378            1239.045    139            Run         OK
+2013-02-01 20:10    -3.02             10.3       7.1774            1273.976    132            Run         OK
+2013-02-01 20:20    -3.50             10.5       7.3004            1254.343    136            Run         OK
+2013-02-01 20:30    -3.47             10.7       7.7331            1278.701    131            Run         OK
+2013-02-01 20:40    -3.53             10.7       7.6289            1269.522    134            Run         OK
+2013-02-01 20:50    -3.04             10.1       7.0893            1296.482    135            Run         OK
+2013-02-01 21:00    -3.31             10.7       7.8652            1278.775    133            Run         OK
+2013-02-01 21:10    -3.44             10.7       7.6277            1232.615    134            Run         OK
+2013-02-01 21:20    -3.46             10.5       7.9821            1219.4      135            Run         OK
+2013-02-01 21:30    -3.80             10.7       7.5614            1280.438    132            Run         OK
+2013-02-01 21:40    -3.26             10.7       7.2718            1253.659    136            Run         OK
+2013-02-01 21:50    -3.75             10.5       7.6549            0           137            Fault       Fault code A
+2013-02-01 22:00    -3.15             10.8       7.6856            0           133            Fault       Fault code A
+2013-02-01 22:10    -3.89             10.7       7.8238            0           135            Fault       Fault code A
+2013-02-01 22:20    -3.80             10.4       7.1408            0           133            Fault       Fault code A
+2013-02-01 22:30    -3.86             10.4       7.1721            0           133            Fault       Fault code A
+2013-02-01 22:40    -3.04             10.1       7.6194            0           136            Fault       Fault code A
+=================   ===============   ========   ===============   =========   ============   =========   =============
 
 
 
@@ -106,52 +106,111 @@ Summary file that contains some statistics about the data. A useful tool to get 
 
 Contains the following information.
 
-===============================================   =======
-Value Field name                                  Purpose
-===============================================   =======
-Dataset name                                      Data set name as defined in the config file
-Production losses due to icing                    Production losses during operation, that are classified to be icing related, in kWh
-Relative production losses due to icing           Previous line's losses as % of reference
-Losses due to icing related stops                 Losses due to stops during operation that are classified to be icing related
-Relative losses due to icing related stops        Previous line's losses as % of reference
-Icing during production                           Icing time in hours during production. Same definition of icing as on row 2
-Icing during production (% of total data)         Previous line's value as % of the entire dataset
-Turbine stopped during production                 Amount of time turbine is stopped due to icing. Same definition of stop as "icing related stops" above
-Turbine stopped production (% of total data)      Previous line's value as % of the entire dataset
-Over production hours                             Amount of time in hours the production is above P90 curve and temperature is below the alarm limit
-Over production hours (% of total)                Previous line's value as % of the entire dataset
-IPS on hours                                      Number of hours blade heating is on. (Will only appear in summary if the site in question has IPS)
-IPS on hours (% of total)                         Previous line's value as % of the entire dataset
-Losses during IPS operation                       Sum of production losses during the times IPS is operating. The loss here is difference between reference and actual value, IPS self consumption is not taken into account. (Will only appear in summary if the site in question has IPS).
-Relative losses during IPS operation              Previous line's losses as % of reference
-IPS self consumption                              If there is an IPS power consumption value in the source data, IPS self consumption in kWh, will show up here
-IPS self consumption (% of total)                 Previous line's losses as % of reference
-SCADA forced stops                                Number of hours the turbine is stopped due to some reason as indicated by the SCADA status code
-Time Based Availability (TBA)                     Percentage of how much of the time the turbine is operating normally
-Loss during SCADA stops                           Production loss during the times turbine is not operating in kWh
-Relative losses during SCADA stops (% of total)   Previous line's losses as % of reference
-Power curve uncertainty                           Average of power curve uncertainty (calculated only for bins between 4 m/s and 15 m/s)
-Production upper limit (std.dev)                  Upper limit for the production assuming the power curve uncertainty on previous row
-Production lower limit (std.dev)                  Lower limit for the production assuming the power curve uncertainty on previous row
-Production P90                                    Production estimate using the P90 power curve
-Production P10                                    Production estimate using the P10 power curve
-Theoretical mean production                       Production assuming the reference power curve, using the wind speed measurement in file, not taking turbine state into account
-Observed power production                         Total production calculated form the output power column in the source data
-Total Losses                                      Observed power - Theoretical mean power
-Energy Based Availability (EBA)                   Observed Power / Theoretical mean power as %
-Data start time                                   First time stamp used for analysis
-Data stop time                                    Last time stamp used for analysis
-Total amount of data                              difference between start and stop time in hours
-Reference data start time                         First time stamp in data
-Reference data stop time                          Last time stamp in data
-Total amount of data in reference dataset         difference between start and stop time in reference data hours
-Data availability                                 % of data available between first and last timestamp
-Sample count in original data                     Sample count in the dataset that is read in at first stage
-Sample count in after filtering                   Sample count after all filtering steps
-Data loss due to filtering                        Amount of data lost during filtering
-Sample count in reference data                    Sample count in reference data, used to build the reference power curve
-Reference dataset as % of original data           reference dataset size as % of original
-===============================================   =======
+.. tabularcolumns:: |\Y{0.2}|\Y{0.8}|
+
++------------------------------------------------+---------------------------------------------------------------------+
+|Value Field name                                |  Purpose                                                            |
++================================================+=====================================================================+
+|Dataset name                                    |  Data set name as defined in the config file                        |
++------------------------------------------------+---------------------------------------------------------------------+
+|Production losses due to icing                  |  Production losses during operation, that are classified to be      |
+|                                                |  icing related, in kWh                                              |
++------------------------------------------------+---------------------------------------------------------------------+
+|Relative production losses due to icing         |  Previous line's losses as % of reference                           |
++------------------------------------------------+---------------------------------------------------------------------+
+|Losses due to icing related stops               |  Losses due to stops during operation that are classified to be     |
+|                                                |  icing related                                                      |
++------------------------------------------------+---------------------------------------------------------------------+
+|Relative losses due to icing related stops      |  Previous line's losses as % of reference                           |
++------------------------------------------------+---------------------------------------------------------------------+
+|Icing during production                         |  Icing time in hours during production.                             |
+|                                                |  Same definition of icing as on row 2                               |
++------------------------------------------------+---------------------------------------------------------------------+
+|Icing during production (% of total data)       |  Previous line's value as % of the entire dataset                   |
++------------------------------------------------+---------------------------------------------------------------------+
+|Turbine stopped during production               |  Amount of time turbine is stopped due to icing. Same definition    |
+|                                                |  of stop as "icing related stops" above                             |
++------------------------------------------------+---------------------------------------------------------------------+
+|Turbine stopped production (% of total data)    |  Previous line's value as % of the entire dataset                   |
++------------------------------------------------+---------------------------------------------------------------------+
+|Over production hours                           |  Amount of time in hours the production is above P90 curve          |
+|                                                |  and temperature is below the alarm limit                           |
++------------------------------------------------+---------------------------------------------------------------------+
+|Over production hours (% of total)              |  Previous line's value as % of the entire dataset                   |
++------------------------------------------------+---------------------------------------------------------------------+
+|IPS on hours                                    |  Number of hours blade heating is on.                               |
+|                                                |  (Will only appear in summary if the site in question has IPS)      |
++------------------------------------------------+---------------------------------------------------------------------+
+|IPS on hours (% of total)                       |  Previous line's value as % of the entire dataset                   |
++------------------------------------------------+---------------------------------------------------------------------+
+|Losses during IPS operation                     |  Sum of production losses during the times IPS is operating.        |
+|                                                |  The loss here is difference between reference and actual value,    |
+|                                                |  IPS self consumption is not taken into account.                    |
+|                                                |  (Will only appear in summary if the site in question has IPS).     |
++------------------------------------------------+---------------------------------------------------------------------+
+|Relative losses during IPS operation            |  Previous line's losses as % of reference                           |
++------------------------------------------------+---------------------------------------------------------------------+
+|IPS self consumption                            |  If there is an IPS power consumption value in the source data,     |
+|                                                |  IPS self consumption in kWh, will show up here                     |
++------------------------------------------------+---------------------------------------------------------------------+
+|IPS self consumption (% of total)               |  Previous line's losses as % of reference                           |
++------------------------------------------------+---------------------------------------------------------------------+
+|SCADA forced stops                              |  Number of hours the turbine is stopped due to some reason          |
+|                                                |  as indicated by the SCADA status code                              |
++------------------------------------------------+---------------------------------------------------------------------+
+|Time Based Availability (TBA)                   |  Percentage of the time the turbine is operating normally           |
++------------------------------------------------+---------------------------------------------------------------------+
+|Loss during SCADA stops                         |  Production loss during the times turbine is not operating in kWh   |
++------------------------------------------------+---------------------------------------------------------------------+
+|Relative losses during SCADA stops (% of total) |  Previous line's losses as % of reference                           |
++------------------------------------------------+---------------------------------------------------------------------+
+|Power curve uncertainty                         |  Average of power curve uncertainty                                 |
+|                                                |  (calculated only for bins between 4 m/s and 15 m/s)                |
++------------------------------------------------+---------------------------------------------------------------------+
+|Production upper limit (std.dev)                |  Upper limit for the production using power curve uncertainty above |
++------------------------------------------------+---------------------------------------------------------------------+
+|Production lower limit (std.dev)                |  Lower limit for the production using power curve uncertainty above |
++------------------------------------------------+---------------------------------------------------------------------+
+|Production P90                                  |  Production estimate using the P90 power curve                      |
++------------------------------------------------+---------------------------------------------------------------------+
+|Production P10                                  |  Production estimate using the P10 power curve                      |
++------------------------------------------------+---------------------------------------------------------------------+
+|Theoretical mean production                     |  Production assuming the reference power curve,                     |
+|                                                |  using the wind speed measurement in file,                          |
+|                                                |  not taking turbine state into account                              |
++------------------------------------------------+---------------------------------------------------------------------+
+|Observed power production                       |  Total production calculated from the output power column           |
++------------------------------------------------+---------------------------------------------------------------------+
+|Total Losses                                    |  Observed power - Theoretical mean power                            |
++------------------------------------------------+---------------------------------------------------------------------+
+|Energy Based Availability (EBA)                 |  Observed Power / Theoretical mean power as %                       |
++------------------------------------------------+---------------------------------------------------------------------+
+|Data start time                                 |  First time stamp used for analysis                                 |
++------------------------------------------------+---------------------------------------------------------------------+
+|Data stop time                                  |  Last time stamp used for analysis                                  |
++------------------------------------------------+---------------------------------------------------------------------+
+|Total amount of data                            |  difference between start and stop time in hours                    |
++------------------------------------------------+---------------------------------------------------------------------+
+|Reference data start time                       |  First time stamp in data                                           |
++------------------------------------------------+---------------------------------------------------------------------+
+|Reference data stop time                        |  Last time stamp in data                                            |
++------------------------------------------------+---------------------------------------------------------------------+
+|Total amount of data in reference dataset       |  difference between start and stop time in reference data hours     |
++------------------------------------------------+---------------------------------------------------------------------+
+|Data availability                               |  % of data available between first and last timestamp               |
++------------------------------------------------+---------------------------------------------------------------------+
+|Sample count in original data                   |  Sample count in the dataset that is read in at first stage         |
++------------------------------------------------+---------------------------------------------------------------------+
+|Sample count in after filtering                 |  Sample count after all filtering steps                             |
++------------------------------------------------+---------------------------------------------------------------------+
+|Data loss due to filtering                      |  Amount of data lost during filtering                               |
++------------------------------------------------+---------------------------------------------------------------------+
+|Sample count in reference data                  |  Sample count in reference data,                                    |
+|                                                |  used to build the reference power curve                            |
++------------------------------------------------+---------------------------------------------------------------------+
+|Reference dataset as % of original data         |  reference dataset size as % of original                            |
++------------------------------------------------+---------------------------------------------------------------------+
+
 
 ================
 data time series

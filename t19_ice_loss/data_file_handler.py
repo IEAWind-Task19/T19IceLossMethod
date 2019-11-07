@@ -44,6 +44,12 @@ class CSVimporter:
         self.fault_dict = {}
         self.result_dir = '.'
         self.timestamp_index = 0
+        self.summaryfile_write = True
+        self.pc_plot_picture = True
+        self.alarm_time_series_file_write = False
+        self.filtered_raw_data_write = False
+        self.icing_events_write = False
+        self.power_curve_write = True
 
     def read_file_options_from_file(self,config_filename):
         """
@@ -64,7 +70,7 @@ class CSVimporter:
             else:
                 self.delim = delimiter
             quot_char = config.get('Source file','quotechar', fallback=None)
-            if quot_char.upper() == 'NONE':
+            if (quot_char is None) or (quot_char.upper() == 'NONE'):
                 self.quote_char = None
             else:
                 self.quote_char = quot_char
@@ -74,6 +80,12 @@ class CSVimporter:
             self.fault_columns = [int(column_index) for column_index in fault_column_string.split(',')]
             self.replace_faults = config.getboolean('Source file','replace fault codes',fallback=False)
             self.result_dir = config.get('Output','result directory',fallback='.')
+            self.summaryfile_write = config.getboolean('Output', 'summary', fallback=True)
+            self.pc_plot_picture = config.getboolean('Output', 'plot', fallback=True)
+            self.alarm_time_series_file_write = config.getboolean('Output', 'alarm time series', fallback=False)
+            self.filtered_raw_data_write = config.getboolean('Output', 'filtered raw data', fallback=False)
+            self.icing_events_write = config.getboolean('Output', 'icing events', fallback=False)
+            self.power_curve_write = config.getboolean('Output', 'power curve', fallback=True)
             self.timestamp_index = int(config.get('Data Structure','timestamp index'))
         except configparser.NoOptionError as missing_value:
             print("missing config option: {0} in {1}".format(missing_value, config_filename))
@@ -291,8 +303,35 @@ class Result_file_writer():
     sets up a writer to deal with results of the counter
     """
     def __init__(self):
-        pass
-    
+        self.result_dir = './'
+        self.summaryfile_write = True
+        self.pc_plot_picture = True
+        self.alarm_time_series_file_write = False
+        self.filtered_raw_data_write = False
+        self.icing_events_write = False
+        self.power_curve_write = True
+
+
+    def set_output_file_options(self, config_filename):
+        """
+        read the parameters set in .ini file for the Output section. These are used to select what outputs will be written and what not
+
+        :param config_filename: Name of the config file used
+        """
+        config = configparser.ConfigParser()
+        config.read(config_filename)
+        try:
+            self.result_dir = config.get('Output', 'result directory', fallback='./')
+            self.summaryfile_write = config.getboolean('Output', 'summary', fallback=True)
+            self.pc_plot_picture = config.getboolean('Output', 'plot', fallback=True)
+            self.alarm_time_series_file_write = config.getboolean('Output', 'alarm time series', fallback=False)
+            self.filtered_raw_data_write = config.getboolean('Output', 'filtered raw data', fallback=False)
+            self.icing_events_write = config.getboolean('Output', 'icing events', fallback=False)
+            self.power_curve_write = config.getboolean('Output', 'power curve', fallback=True)
+        except configparser.NoOptionError as missing_value:
+            print("missing config option: {0} in {1}".format(missing_value, config_filename))
+        except ValueError as wrong_value:
+            print("Wrong type of value in {0}: {1}".format(config_filename, wrong_value))
     
     def write_alarm_file(self, result_filepath, array):
         """
@@ -548,7 +587,7 @@ class Result_file_writer():
                     f.write("{heading: <{fill1}}\t {value:>{fill2}.1f} \t{unit}\n".format(heading='Relative losses during IPS operation', fill1=50, value=ips_on_loss_perc, fill2=20,unit='%'))
                 if aepc.ice_detection:
                     f.write("{heading: <{fill1}}\t {value:>{fill2}.1f} \t{unit}\n".format(heading='Ice detector icing hours',fill1=50, value=ice_detection_duration, fill2=20, unit='h'))
-                    f.write("{heading: <{fill1}}\t {value:>{fill2}.1f} \t{unit}\n".format(heading='Ice detector icing hours (% of total data)',fill1=50, value=ice_detection_duration_perc, fill2=20, unit='h'))
+                    f.write("{heading: <{fill1}}\t {value:>{fill2}.1f} \t{unit}\n".format(heading='Ice detector icing hours (% of total data)',fill1=50, value=ice_detection_duration_perc, fill2=20, unit='%'))
                     f.write("{heading: <{fill1}}\t {value:>{fill2}.1f} \t{unit}\n".format(heading='Losses during ice detector alarms',fill1=50, value=ice_detection_loss, fill2=20, unit='h'))
                     f.write("{heading: <{fill1}}\t {value:>{fill2}.1f} \t{unit}\n".format(heading='Relative losses during ice detector alarm (% of total data)',fill1=50, value=ice_detection_loss_perc, fill2=20, unit='h'))
                 if aepc.heating_power_index >= 0:

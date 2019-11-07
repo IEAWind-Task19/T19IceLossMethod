@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="t19_ice_loss", # Replace with your own username
-    version="3.0.0",
+    version="2.2.0",
     author="IEA Wind Task 19",
     author_email="timo.karlsson@vtt.fi",
     description="A tool to estimate icing losses from wind turbine SCADA data",

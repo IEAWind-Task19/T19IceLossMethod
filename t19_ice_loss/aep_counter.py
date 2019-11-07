@@ -66,6 +66,8 @@ class AEPcounter:
         self.heating_status_value = 0
         self.heating_status_type = 0
         self.heating_power_index = 0
+        self.replace_faults = False
+        self.fault_columns = []
         # TODO:
         # fix icing and stoptime to be actual minutes instead of sample count
 
@@ -146,8 +148,8 @@ class AEPcounter:
             stop_codes_raw = config.get('Data Structure', 'status code stop value')
             normal_state_raw = config.get('Data Structure','normal state')
             # normal state can be given as text or as a list of codes, all cases need to be sorted
-            replace_faults = config.getboolean('Source file','replace fault codes')
-            if replace_faults: # fault codes as text
+            self.replace_faults = config.getboolean('Source file','replace fault codes')
+            if self.replace_faults: # fault codes as text
                 fault_codes = [self.fault_dict[codestring] for codestring in normal_state_raw.split(',')]
                 stop_code_values = [self.fault_dict[stop_code_string] for stop_code_string in stop_codes_raw.split(',')]
             else:
@@ -159,6 +161,8 @@ class AEPcounter:
             self.result_dir = config.get('Output', 'result directory', fallback=self.get_fallback_value('Output','result directory'))
             status_stops_raw = config.get('Data Structure', 'status index')
             self.status_stop_index = [int(code) for code in status_stops_raw.split(',')]
+            fault_column_string = config.get('Source file','fault columns')
+            self.fault_columns = [int(column_index) for column_index in fault_column_string.split(',')]
         except configparser.NoOptionError as missing_value:
             print("missing config option in {0}: {1}".format(filename, missing_value))
             sys.exit(1)
@@ -238,11 +242,19 @@ class AEPcounter:
                 self.heated_site = config.getboolean("Icing","heating")
                 self.ice_detection = config.getboolean("Icing","ice detection")
                 self.ice_alarm_index = int(config.get("Icing","icing alarm index"))
-                self.ice_alarm_value = int(config.get("Icing","icing alarm code"))
+                if self.replace_faults and (self.ice_alarm_index in self.fault_columns):
+                    ice_alarm_raw = config.get("Icing", "icing alarm code")
+                    self.ice_alarm_value = self.fault_dict[ice_alarm_raw]
+                else:
+                    self.ice_alarm_value = int(config.get("Icing", "icing alarm code"))
                 heating_index_raw = config.get("Icing","ips status index")
                 heating_value_raw = config.get("Icing","ips status code")
                 self.heating_status_index = [int(code) for code in heating_index_raw.split(',')]
-                self.heating_status_value = [int(code) for code in heating_value_raw.split(',')]
+                if self.replace_faults and any({*self.heating_status_index} & {*self.fault_columns}): # status codes as text
+                    self.heating_status_value = [self.fault_dict[codestring] for codestring in heating_value_raw.split(',')]
+                else:
+                    self.heating_status_value = [int(code) for code in heating_value_raw.split(',')]
+
                 self.heating_status_type = int(config.get("Icing","ips status type"))
                 self.heating_power_index = int(config.get("Icing","ips power consumption index"))
             except configparser.NoOptionError as missing_value:

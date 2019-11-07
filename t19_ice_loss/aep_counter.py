@@ -56,7 +56,7 @@ class AEPcounter:
         self.starttimestamp = datetime.datetime.min
         self.stoptimestamp = datetime.datetime.max
         self.stopcodes = [] # status codes for icing related stops
-        self.stop_filter_type = 1 # 0 for power level based 1 for status code based where stop if true 2 for stop if false
+        self.stop_filter_type = 0 # 0 for power level based 1 for status code based where stop if true 2 for stop if false
         self.status_stop_index = None
         self.heated_site = False
         self.ice_detection = False
@@ -95,9 +95,11 @@ class AEPcounter:
                            'icing events': 'False','power curve': 'True'}
             return o_fallbacks[config_var]
         elif section == 'Data Structure':
-            # these are all mandatory, need to define this anyway
-            ds_fallbacks = {}
-            return None
+            # these are all mandatory, except this one, it needs a fallback to maintain compatibility with old inifiles
+            # need to define this anyway
+            ds_fallbacks = {"status code stop value": '0',
+                            "status index": '-1'}
+            return ds_fallbacks[config_var]
         elif section == 'Icing':
             # icing is not mandatory anyway
             i_fallbacks = {}
@@ -145,7 +147,7 @@ class AEPcounter:
             state_index_raw = config.get('Data Structure','state index')
             self.state_index = [int(column_index) for column_index in state_index_raw.split(',')]
             self.site_elevation = float(config.get('Data Structure','site elevation'))
-            stop_codes_raw = config.get('Data Structure', 'status code stop value')
+            stop_codes_raw = config.get('Data Structure', 'status code stop value', fallback=self.get_fallback_value('Data Structure', 'status code stop value'))
             normal_state_raw = config.get('Data Structure','normal state')
             # normal state can be given as text or as a list of codes, all cases need to be sorted
             self.replace_faults = config.getboolean('Source file','replace fault codes')
@@ -159,7 +161,7 @@ class AEPcounter:
             self.stopcodes = stop_code_values
             self.id = config.get('Source file','id')
             self.result_dir = config.get('Output', 'result directory', fallback=self.get_fallback_value('Output','result directory'))
-            status_stops_raw = config.get('Data Structure', 'status index')
+            status_stops_raw = config.get('Data Structure', 'status index', fallback=self.get_fallback_value('Data Structure', 'status index'))
             self.status_stop_index = [int(code) for code in status_stops_raw.split(',')]
             fault_column_string = config.get('Source file','fault columns')
             self.fault_columns = [int(column_index) for column_index in fault_column_string.split(',')]
@@ -1309,6 +1311,11 @@ class AEPcounter:
 
         :param data: input data used to asses production
         :param pc: power curve used to calculate theoretical production
+        :param ice_alarms: time series of icing alarms
+        :param ice_stops: time series of icing induced stops
+        :param status_stops: time series of stops as indicated by a statuscode in the scada
+        :param ips_on: toggle if IPS is available or not
+        :param ice_detection: timeseries of icing events as detected by an ice detector
         :return:
         """
 
@@ -1325,10 +1332,15 @@ class AEPcounter:
         iced_stops_power = np.c_[ice_stop_events[:,0], ice_stop_events[:,3]-ice_stop_events[:,5]]
         iced_stops = self.calculate_production(iced_stops_power,1)
         # status
-        status_stop_events = status_stops[status_stops[:, 1] == 4.0]
-        # iced_stops = np.hstack((ice_stop_events[:,0], ice_stop_events[:,3]-ice_stop_events[:,5]))
-        status_stops_power = np.c_[status_stop_events[:,0], status_stop_events[:,3]-status_stop_events[:,5]]
-        status_stops_prod = self.calculate_production(status_stops_power,1)
+        if status_stops is not None:
+            status_stop_events = status_stops[status_stops[:, 1] == 4.0]
+            # iced_stops = np.hstack((ice_stop_events[:,0], ice_stop_events[:,3]-ice_stop_events[:,5]))
+            status_stops_power = np.c_[status_stop_events[:,0], status_stop_events[:,3]-status_stop_events[:,5]]
+            status_stops_prod = self.calculate_production(status_stops_power,1)
+        else:
+            status_stop_events = None
+            status_stops_power = None
+            status_stops_prod = None
 
         ##############
         # IPS section
@@ -1358,14 +1370,18 @@ class AEPcounter:
             actual_production_sums = self.one_year_month_sums(actual_production,year,1)
             iced_power_sums = self.one_year_month_sums(iced_power_drops,year,1)
             ice_stop_sums = self.one_year_month_sums(iced_stops,year,1)
-            status_stop_sums = self.one_year_month_sums(status_stops_prod,year,1)
+            if status_stops is not None:
+                status_stop_sums = self.one_year_month_sums(status_stops_prod,year,1)
+            else:
+                status_stop_sums = np.copy(theoretical_production_sums)
+                status_stop_sums[:, 1] = 0.0
 
             if ips_on is not None:
                 ips_on_sums = self.one_year_month_sums(ips_on_prod,year,1)
                 ice_detection_sums = self.one_year_month_sums(ice_detection_prod, year,1)
             else:
                 print("Dummy IPS Values")
-                ips_on_sums = np.copy(status_stop_sums)
+                ips_on_sums = np.copy(theoretical_production_sums)
                 ips_on_sums[:,1] = 0.0
                 ice_detection_sums = ips_on_sums
                 ips_self_consumption = 0.0

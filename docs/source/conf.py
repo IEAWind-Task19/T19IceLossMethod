@@ -21,7 +21,7 @@ copyright = '2019, IEA Wind Task 19'
 author = 'IEA Wind Task 19'
 
 # The full version, including alpha/beta/rc tags
-release = '2.2'
+release = '2.2.2'
 
 
 # -- General configuration ---------------------------------------------------

@@ -36,8 +36,8 @@ class AEPcounter:
         self.pow_index = 4  # column of POWER in source data
         self.state_index = [5]  # column of TURBINE STATE INFORMATION
         self.normal_state = [0]  # normal/default value of state variable
-        self.wind_bins = np.arange(0, 20, 0.5)  # wind speed binning
-        self.direction_bins = np.arange(0, 360, 90)  # wind direction binning
+        self.wind_bins = np.arange(0, 20, 1)  # wind speed binning
+        self.direction_bins = np.arange(0, 360, 360)  # wind direction binning
         self.rated_power = 1.0  # rated power of the turbine (1.0 if power given as relative to rated power)
         self.icing_time = 3 # icing length in samples for now
         self.stop_time = 6 # time filter for stops in number of samples
@@ -152,8 +152,8 @@ class AEPcounter:
             # normal state can be given as text or as a list of codes, all cases need to be sorted
             self.replace_faults = config.getboolean('Source file','replace fault codes')
             if self.replace_faults: # fault codes as text
-                fault_codes = [self.fault_dict[codestring] for codestring in normal_state_raw.split(',')]
-                stop_code_values = [self.fault_dict[stop_code_string] for stop_code_string in stop_codes_raw.split(',')]
+                fault_codes = [self.replace_faultcode(codestring) for codestring in normal_state_raw.split(',')]
+                stop_code_values = [self.replace_faultcode(stop_code_string) for stop_code_string in stop_codes_raw.split(',')]
             else:
                 fault_codes = [int(code) for code in normal_state_raw.split(',')]
                 stop_code_values = [int(stop_code) for stop_code in stop_codes_raw.split(',')]
@@ -174,6 +174,13 @@ class AEPcounter:
         except ValueError as wrong_value:
             print("Wrong type of value in {0}: {1}".format(filename, wrong_value))
             sys.exit(1)
+
+    def replace_faultcode(self, code):
+        if code in self.fault_dict:
+            return self.fault_dict[code]
+        else:
+            self.fault_dict[code] = max(self.fault_dict.values()) + 1
+            return self.fault_dict[code]
 
     def set_binning_options_from_file(self, filename):
         """
@@ -559,7 +566,7 @@ class AEPcounter:
             med_dist = np.nanmedian(mean_distances)
             bad_values = []
             for index,value in enumerate(mean_distances):
-                if value/med_dist > value_filter:
+                if (value/med_dist) > value_filter:
                     bad_values.append(index)
 
             neighbours = np.ones(y).astype('bool')
@@ -642,7 +649,7 @@ class AEPcounter:
         for i in range(len(data)):
             if i != 0:
                 # integrity check
-                if (data[i,0] - data[i-1,0]) > delta or np.isnan(data[i,index]) or np.isnan(data[i-1,index]) or (data[i,index] <=0.0) or (data[i-1,index] <= 0.0):
+                if ((data[i,0] - data[i-1,0]) > delta) or np.isnan(data[i,index]) or np.isnan(data[i-1,index]) or (data[i,index] <=0.0) or (data[i-1,index] <= 0.0):
                     prod = 0
                 else:
                     dur = (data[i,0]-data[i-1,0]).total_seconds()/60.0/60.0 # length in hours
@@ -729,15 +736,15 @@ class AEPcounter:
                     pc[speed_bin_index, direction_bin_index, bin_size_index] = bin_contents.size
                 else:
                     # suppress runtime errors caused by bins with nothing but nans
-                    if np.isnan(bin_contents[:, self.ws_index].astype('float')).all() == True:
+                    if np.isnan(bin_contents[:, self.ws_index].astype('float')).all():
                         pc[speed_bin_index, direction_bin_index, wind_speed_index] = np.nan
                     else:
                         pc[speed_bin_index, direction_bin_index, wind_speed_index] = np.nanmedian(bin_contents[:, self.ws_index].astype('float'))
-                    if np.isnan(bin_contents[:, self.wd_index].astype('float')).all() == True:
+                    if np.isnan(bin_contents[:, self.wd_index].astype('float')).all():
                         pc[speed_bin_index, direction_bin_index, wind_dir_index] = np.nan
                     else:
                         pc[speed_bin_index, direction_bin_index, wind_dir_index] = self.wind_dir_mean(bin_contents[:, self.wd_index].astype('float'))
-                    if np.isnan(bin_contents[:,self.pow_index].astype('float')).all() == True:
+                    if np.isnan(bin_contents[:, self.pow_index].astype('float')).all():
                         pc[speed_bin_index, direction_bin_index, power_index] = np.nan
                         pc[speed_bin_index, direction_bin_index, low_limit_index] = np.nan
                         pc[speed_bin_index, direction_bin_index, high_limit_index] = np.nan
@@ -930,7 +937,7 @@ class AEPcounter:
         timed = datetime.timedelta(seconds=601)
         for index,line in enumerate(data):
             # integrity check for the data
-            if index != 0 and index != len(data)-1:
+            if (index != 0) and (index != len(data)-1):
                 continuous = (line[self.ts_index] - data[index-1,self.ts_index]) < timed and (data[index+1,self.ts_index] - line[self.ts_index]) < timed
             else:
                 continuous = False
@@ -951,12 +958,12 @@ class AEPcounter:
 
             if continuous:
                 if over:
-                    if line[self.pow_index] >= int_lim and line[self.temp_index] <= self.icing_temperature_limit:
+                    if (line[self.pow_index] >= int_lim) and (line[self.temp_index] <= self.icing_temperature_limit):
                         pow_alrm = 3.0
                     else:
                         pow_alrm = 0.0
                 else:
-                    if line[self.pow_index] <= int_lim and line[self.temp_index] <= self.icing_temperature_limit:
+                    if (line[self.pow_index] <= int_lim) and (line[self.temp_index] <= self.icing_temperature_limit):
                         pow_alrm = 1.0
                     else:
                         pow_alrm = 0.0
@@ -1008,7 +1015,7 @@ class AEPcounter:
 
             # sort starts and stops into an array
             try:
-                while index < max_index and datalen>0:
+                while (index < max_index) and (datalen > 0):
                     try:
                         starttime = starts[index]
                         stoptime = stops[index]
@@ -1092,8 +1099,6 @@ class AEPcounter:
                 if j != self.ws_index:
                     new_line.append(item)
                 else:
-                    # raising a negative number to power of (1/3) produces funky results, need a way to go around that
-                    # x^(1/3) is symmetric around 0 i.e. (-x)^(1/3) == -(x^(1/3)), so we can do
                     # density_correction = ((line[self.temp_index]+kelvin)*p_std)/(temp_std*(p_std*((1-self.site_elevation*2.2557e-5)**5.25588)))
                     density_correction = (temp_std/(line[self.temp_index]+kelvin))*((1-self.site_elevation*2.2557e-5)**5.25588)
                     if np.isnan(density_correction):
@@ -1147,7 +1152,7 @@ class AEPcounter:
         # [timestamp, alarm, wind speed, reference power, temperature, power]
         pow_alarms = self.power_alarms(data, power_curve)
         for line in pow_alarms:
-            if line[1] == 1 and line[5] <= stop_limit and line[3] >= stop_limit:
+            if (line[1] == 1) and (line[5] <= stop_limit) and (line[3] >= stop_limit):
                 line[1] = 2.0
             else:
                 line[1] = 0

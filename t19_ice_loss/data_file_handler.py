@@ -155,8 +155,7 @@ class CSVimporter:
         """
         outfile = open(outfilename,'w')
         json.dump(fault_dict, outfile, indent=4, sort_keys= True)
-        outfile.close() 
-
+        outfile.close()
 
         
     def update_fault_codes(self, column_num, infilename, write_to_file=False, outfilename=''):
@@ -210,7 +209,12 @@ class CSVimporter:
     def process_fault_codes(self):
         """
         create a data structure that can be used to replace textual fault codes in the data that is read in for processing
-
+        TODO: Currently, only acceptable values are those that are found in the file itself. This should be changed
+                to allow seeding of the values that are set in the .ini file. You can't set a value for this
+                that is not found in a file. i.e. if you have a fault indicator value "FAULT" and the data does not have any
+                lines with that value, the code will crash.
+                This can be changed ether here or at the point where fault_dict is accessed, you check if value exists,
+                if not then you add it. Requires ability to manually add values to fault_dict.
         """
         fault_code_filename = self.create_faultfile()
         if len(self.fault_columns) == 1:
@@ -328,6 +332,7 @@ class Result_file_writer():
             self.filtered_raw_data_write = config.getboolean('Output', 'filtered raw data', fallback=False)
             self.icing_events_write = config.getboolean('Output', 'icing events', fallback=False)
             self.power_curve_write = config.getboolean('Output', 'power curve', fallback=True)
+            self.power_curve_plot_max = int(config.get('Data Structure', 'maximum wind speed', fallback='20'))
         except configparser.NoOptionError as missing_value:
             print("missing config option: {0} in {1}".format(missing_value, config_filename))
         except ValueError as wrong_value:
@@ -438,6 +443,7 @@ class Result_file_writer():
         reference_start = data[0,aepc.ts_index]
         reference_stop = data[-1,aepc.ts_index]
         reference_data_period = (reference_stop-reference_start).total_seconds()/60.0/60.0
+        step_size = data[1, aepc.ts_index] - data[0, aepc.ts_index]
         #check for empty array (no stops)
         if np.shape(stop_timings) == (0,):
             stop_losses = 0.0
@@ -531,11 +537,11 @@ class Result_file_writer():
             ips_on_duration_perc = (ips_on_duration / data_period) * 100.0
             ips_on_loss_perc = (ips_on_production_loss / actual_production_sum) * 100.0
             ips_self_consumption_perc = (ips_self_consumption / actual_production_sum) * 100.0
-        availability = aepc.count_availability(data) * 100.0
+        # availability = aepc.count_availability(data) * 100.0
+        availability = data_sizes[0] / ((stop_time - start_time) / step_size) * 100.0
     
-    
-        data_loss = ((data_sizes[0]-data_sizes[1])/data_sizes[0]) * 100.0
-        reference_loss = (data_sizes[2]/data_sizes[0]) * 100.0
+        filtered_data_size = (data_sizes[1]/data_sizes[0]) * 100.0
+        reference_data_size = (data_sizes[2]/data_sizes[0]) * 100.0
     
         filename_trunk = '_summary.txt'
         full_filename = aepc.result_dir + aepc.id + filename_trunk
@@ -615,9 +621,9 @@ class Result_file_writer():
                 f.write("{heading: <{fill1}}\t {value:>{fill2}.1f} \t{unit}\n".format(heading='Data availability',fill1=50, value=availability, fill2=20, unit='%'))
                 f.write("{heading: <{fill1}}\t {value:>{fill2}d} \t{unit}\n".format(heading='Sample count in original data',fill1=50, value=data_sizes[0], fill2=20, unit=' '))
                 f.write("{heading: <{fill1}}\t {value:>{fill2}d} \t{unit}\n".format(heading='Sample count in after filtering',fill1=50, value=data_sizes[1], fill2=20, unit=' '))
-                f.write("{heading: <{fill1}}\t {value:>{fill2}.1f} \t{unit}\n".format(heading='Data loss due to filtering',fill1=50, value=data_loss, fill2=20, unit='%'))
+                f.write("{heading: <{fill1}}\t {value:>{fill2}.1f} \t{unit}\n".format(heading='Data size after filtering',fill1=50, value=filtered_data_size, fill2=20, unit='%'))
                 f.write("{heading: <{fill1}}\t {value:>{fill2}d} \t{unit}\n".format(heading='Sample count in reference data',fill1=50, value=data_sizes[2], fill2=20, unit=' '))
-                f.write("{heading: <{fill1}}\t {value:>{fill2}.1f} \t{unit}\n".format(heading='Reference dataset as % of original data',fill1=50, value=reference_loss, fill2=20, unit='%'))
+                f.write("{heading: <{fill1}}\t {value:>{fill2}.1f} \t{unit}\n".format(heading='Reference dataset as % of original data',fill1=50, value=reference_data_size, fill2=20, unit='%'))
                 f.write(" \t \t \n")
                 f.write(" \t \t \n")
                 
@@ -832,8 +838,9 @@ class Result_file_writer():
           .format(aepc.id,start_time.strftime("%Y-%m-%d %H:%M:%S"),stop_time.strftime("%Y-%m-%d %H:%M:%S"),availability))
         ax.set_xlabel('Wind speed [m/s]')
         ax.set_ylabel('Power [kW]')
-        ax.set_xticks((list(range(0,22,2))))
-        ax.set_xlim((0, 20))
+        tick_size = 2
+        ax.set_xticks((list(range(0, self.power_curve_plot_max + tick_size, tick_size))))
+        ax.set_xlim((0, self.power_curve_plot_max))
         ax.legend(loc='upper left', framealpha=0.3)
         #     plt.show()
         # hide yaxis to obfuscate the true power values
@@ -865,6 +872,8 @@ class Result_file_writer():
             # fig1.savefig(ts_filename, bbox_inches='tight', dpi=300)
             plt.close(0)
             # plt.close(1)
+            print("{0} : Power curve plots written to : {1}"
+                  .format(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), pc_filename))
         else:
             plt.show()
         #==============================================================================

@@ -76,8 +76,8 @@ def main(configfile_name):
 
     # only use the part of data where temperature is above 3 degrees celsius for the power curve
     # use the full dataset for refernce use time limited for loss calculation
-    # s_reference_data = aepc.state_filter_data(temperature_corrected_data)
-    d_reference_data = aepc.temperature_filter_data(time_limited_data)
+    s_reference_data = aepc.state_filter_data(temperature_corrected_data)
+    d_reference_data = aepc.temperature_filter_data(s_reference_data)
     pd_reference_data = aepc.power_level_filter(d_reference_data)
     reference_data = aepc.diff_filter(pd_reference_data)
     pc = aepc.count_power_curves(reference_data)
@@ -129,7 +129,7 @@ def main(configfile_name):
     rfw.set_output_file_options(configfile_name)
 
     if rfw.summaryfile_write:
-        summary_status, summary_filename, summary_error = rfw.summary_statistics(aepc, time_limited_data, pc, alarm_timings, stop_timings, over_timings, status_timings, ice_timings, ips_timings, data_sizes)
+        summary_status, summary_filename, summary_error = rfw.summary_statistics(aepc, reference_data, pc, alarm_timings, stop_timings, over_timings, status_timings, ice_timings, ips_timings, data_sizes)
         if summary_status:
             print("{0} : Summary written successfully into: {1}".format(dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), summary_filename))
         else:

@@ -408,7 +408,7 @@ class Result_file_writer():
             return False, e
         
     
-    def summary_statistics(self, aepc, data, pc, alarm_timings, stop_timings, over_timings, status_timings, ice_timings, ips_timings, data_sizes):
+    def summary_statistics(self, aepc, data, reference_data, pc, alarm_timings, stop_timings, over_timings, status_timings, ice_timings, ips_timings, data_sizes):
         """
         Calculate summary statistics for the dataset. contains:
             availability
@@ -423,6 +423,7 @@ class Result_file_writer():
     
         :param aepc: the active aeoc object
         :param data: data used to calculate statistics
+        :param reference_data: the reference dataset used to calculate power curve
         :param pc: power curve structure
         :param alarm_timings: reduced power incidents
         :param stop_timings: icing induced stops
@@ -440,8 +441,8 @@ class Result_file_writer():
         else:
             stop_time = aepc.stoptimestamp
         data_period = (stop_time-start_time).total_seconds()/60.0/60.0
-        reference_start = data[0,aepc.ts_index]
-        reference_stop = data[-1,aepc.ts_index]
+        reference_start = reference_data[0,aepc.ts_index]
+        reference_stop = reference_data[-1,aepc.ts_index]
         reference_data_period = (reference_stop-reference_start).total_seconds()/60.0/60.0
         step_size = data[1, aepc.ts_index] - data[0, aepc.ts_index]
         #check for empty array (no stops)
@@ -893,7 +894,8 @@ class Result_file_writer():
         read powercurve from file produced by the program
                 
         Some information is lost during the save process right now. real bin centers are not saved and neither are sample counts
-        
+        TODO: Needs to be updated, writing as well. Power curve now has a lot more information.
+            might make sense to change the formatting of the power curve file to something a bit more structured
         :param filename: filename where the power curve sits
         :returns: power curve structure formatted in same way as earlier
         """

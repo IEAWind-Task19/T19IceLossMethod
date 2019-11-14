@@ -62,6 +62,7 @@ def main(configfile_name):
     # aepc.stoptimestamp = dt.datetime(2015, 10, 1, 0, 0, 0)
     # calculate air density correction based on site height using the formula from the spec
     temperature_corrected_data = aepc.air_density_correction(data)
+    # temperature_corrected_data = data.copy()
     # filter the corrected data based on state variable values
     #state_filtered_data = aepc.state_filter_data(temperature_corrected_data)
     time_limited_data = aepc.time_filter_data(temperature_corrected_data)
@@ -129,7 +130,7 @@ def main(configfile_name):
     rfw.set_output_file_options(configfile_name)
 
     if rfw.summaryfile_write:
-        summary_status, summary_filename, summary_error = rfw.summary_statistics(aepc, reference_data, pc, alarm_timings, stop_timings, over_timings, status_timings, ice_timings, ips_timings, data_sizes)
+        summary_status, summary_filename, summary_error = rfw.summary_statistics(aepc, time_limited_data, reference_data, pc, alarm_timings, stop_timings, over_timings, status_timings, ice_timings, ips_timings, data_sizes)
         if summary_status:
             print("{0} : Summary written successfully into: {1}".format(dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), summary_filename))
         else:

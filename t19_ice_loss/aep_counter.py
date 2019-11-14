@@ -176,6 +176,14 @@ class AEPcounter:
             sys.exit(1)
 
     def replace_faultcode(self, code):
+        """
+        Replace textual fault_code with a value from fault_dict. If the wanted faultcode is not in fault_dict,
+        add it as a new maximum value into it and then return the new replacement value.
+
+        :param code:
+        :return the replacement fault code:
+        """
+
         if code in self.fault_dict:
             return self.fault_dict[code]
         else:
@@ -1150,10 +1158,22 @@ class AEPcounter:
         filtered_data = []
         stop_limit = self.stop_level * self.rated_power
         # [timestamp, alarm, wind speed, reference power, temperature, power]
-        pow_alarms = self.power_alarms(data, power_curve)
-        for line in pow_alarms:
-            if (line[1] == 1) and (line[5] <= stop_limit) and (line[3] >= stop_limit):
-                line[1] = 2.0
+        pow_alarms = self.power_alarms(data, power_curve, False) # do time filtering only once
+        for index, line in enumerate(pow_alarms):
+            # if (line[1] == 1) and (line[5] <= stop_limit) and (line[3] >= stop_limit):
+            #     line[1] = 2.0
+            if line[1] == 1:
+            # change this to look forward so tha tif the turbine will stop within a window of mark also the points where we
+            # are above the stop limit to belonging into the stop
+                stops = 0
+                for i in range(index, min(len(pow_alarms), index+self.stop_time)):
+                    templine = pow_alarms[i, :]
+                    if (templine[5] <= stop_limit) and (templine[3] >= stop_limit):
+                        stops += 1
+                if stops > 0:
+                    line[1] = 2.0
+                else:
+                    line[1] = 0
             else:
                 line[1] = 0
             filtered_data.append(line)

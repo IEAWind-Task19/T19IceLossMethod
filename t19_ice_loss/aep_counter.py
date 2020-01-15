@@ -251,6 +251,7 @@ class AEPcounter:
     def set_ips_options_from_file(self, filename):
         """
         set config options for a heated site, first check if "Icing" section even exists, then set the options
+        # if ice detection is set to false or IPS is set to false, don't try to read their options
         """
         config = configparser.ConfigParser()
         config.read(filename)

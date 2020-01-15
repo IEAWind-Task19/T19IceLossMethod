@@ -85,7 +85,7 @@ The power curve calculation results in several for each wind speed bin:
 5. Power curve uncertainty in the bin defined as [standard deviation] / [power]
 6. Sample count in the bin
 
-Sample count can be used to determine the appropriate binning resolution, it is recommended to have at least 6 hours of data in  abin to get a representative result.
+Sample count can be used to determine the appropriate binning resolution, it is recommended to have at least 6 hours of data in a bin to get a representative result.
 
 The code will also try to interpolate over empty bins or bins that have too few samples in them. In these cases a linear interpolation between two closest bins is used.
 

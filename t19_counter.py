@@ -79,8 +79,8 @@ def main(configfile_name):
     # use the full dataset for refernce use time limited for loss calculation
     s_reference_data = aepc.state_filter_data(temperature_corrected_data)
     d_reference_data = aepc.temperature_filter_data(s_reference_data)
-    pd_reference_data = aepc.power_level_filter(d_reference_data)
-    reference_data = aepc.diff_filter(pd_reference_data)
+    reference_data = aepc.power_level_filter(d_reference_data)
+    #reference_data = aepc.diff_filter(pd_reference_data)
     pc = aepc.count_power_curves(reference_data)
     # rfw.write_power_curve_file('../results/power_curve.txt', pc, aepc)
     # save data sizes into a list in order, original, filtered, reference

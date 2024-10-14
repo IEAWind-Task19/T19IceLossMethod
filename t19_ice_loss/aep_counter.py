@@ -262,14 +262,14 @@ class AEPcounter:
                 self.ice_alarm_index = int(config.get("Icing","icing alarm index"))
                 if self.replace_faults and (self.ice_alarm_index in self.fault_columns):
                     ice_alarm_raw = config.get("Icing", "icing alarm code")
-                    self.ice_alarm_value = self.fault_dict[ice_alarm_raw]
+                    self.ice_alarm_value = self.replace_faultcode(ice_alarm_raw)
                 else:
                     self.ice_alarm_value = int(config.get("Icing", "icing alarm code"))
                 heating_index_raw = config.get("Icing","ips status index")
                 heating_value_raw = config.get("Icing","ips status code")
                 self.heating_status_index = [int(code) for code in heating_index_raw.split(',')]
                 if self.replace_faults and any({*self.heating_status_index} & {*self.fault_columns}): # status codes as text
-                    self.heating_status_value = [self.fault_dict[codestring] for codestring in heating_value_raw.split(',')]
+                    self.heating_status_value = [self.replace_faultcode(codestring) for codestring in heating_value_raw.split(',')]
                 else:
                     self.heating_status_value = [int(code) for code in heating_value_raw.split(',')]
 
@@ -1052,20 +1052,20 @@ class AEPcounter:
                                 loss_sum += step_duration * ((loss_at_start + loss_at_stop)/2.0)
                                 if ips_alarm:
                                     ips_sum += step_duration * ((data[i,7] + data[i+1,7])/2.0)
-                        # mean_power_drop = np.nanmean(data[start_index:stop_index,3].astype(np.float32)-data[start_index:stop_index,5].astype(np.float32))
-                        # mean_power = np.nanmean(data[start_index:stop_index,5].astype(np.float32))
-                        # mean_reference_power = np.nanmean(data[start_index:stop_index,3].astype(np.float32))
-                        # mean_wind_speed = np.nanmean(data[start_index:stop_index,2].astype(np.float32))
-                        # mean_temperature = np.nanmean(data[start_index:stop_index,4].astype(np.float32))
+                        mean_power_drop = np.nanmean(data[start_index:stop_index,3].astype(np.float32)-data[start_index:stop_index,5].astype(np.float32))
+                        mean_power = np.nanmean(data[start_index:stop_index,5].astype(np.float32))
+                        mean_reference_power = np.nanmean(data[start_index:stop_index,3].astype(np.float32))
+                        mean_wind_speed = np.nanmean(data[start_index:stop_index,2].astype(np.float32))
+                        mean_temperature = np.nanmean(data[start_index:stop_index,4].astype(np.float32))
                         event_length = (data[stop_index,0]- data[start_index,0]).total_seconds()/60.0/60.0
                         #alarm_stats.append((starttime, stoptime, loss_sum, event_length , mean_power_drop, mean_power, mean_reference_power, mean_wind_speed, mean_temperature))
                         if ips_alarm:
                             if self.heating_power_index < 0:
-                                alarm_stats.append((starttime, stoptime, loss_sum, event_length,0.0))
+                                alarm_stats.append((starttime, stoptime, loss_sum, event_length , mean_power_drop, mean_power, mean_reference_power, mean_wind_speed, mean_temperature ,0.0))
                             else:
-                                alarm_stats.append((starttime, stoptime, loss_sum, event_length,ips_sum))
+                                alarm_stats.append((starttime, stoptime, loss_sum, event_length , mean_power_drop, mean_power, mean_reference_power, mean_wind_speed, mean_temperature,ips_sum))
                         else:
-                            alarm_stats.append((starttime, stoptime, loss_sum, event_length))
+                            alarm_stats.append((starttime, stoptime, loss_sum, event_length , mean_power_drop, mean_power, mean_reference_power, mean_wind_speed, mean_temperature))
                     except TimingError as e:
                         import pdb;pdb.set_trace()
                         print("Start after stop at index {0} in {1}".format(e.index, self.id))
@@ -1076,7 +1076,7 @@ class AEPcounter:
                 print("num starts: {0}; num stops: {1}".format(num_starts, num_stops))
 
 
-        return np.array(alarm_stats)
+        return np.array(alarm_stats, dtype=object)
 
     def air_density_correction(self, data):
         """
@@ -1152,6 +1152,10 @@ class AEPcounter:
 
         uses filtering requirements defined in the specification document: pwr_mean< 0.005*P_rated
 
+        ToDo:
+            Should we add minimum wind speed here, if turbine stops during an icing event it's either caused by icing or low wind
+            Should we only mark the points here where wind speed is above cut-in
+
         :param data: timeseries data of output
         :param power_curve: power curve array used
         :return: filtered data with stops flagged
@@ -1163,7 +1167,8 @@ class AEPcounter:
         for index, line in enumerate(pow_alarms):
             # if (line[1] == 1) and (line[5] <= stop_limit) and (line[3] >= stop_limit):
             #     line[1] = 2.0
-            if line[1] == 1:
+            # power level filter is here to avoid double classifying points to two different classes
+            if (line[1] == 1) and (line[5] <= (self.rated_power * self.power_level_filter_limit)):
             # change this to look forward so tha tif the turbine will stop within a window of mark also the points where we
             # are above the stop limit to belonging into the stop
                 stops = 0
@@ -1244,7 +1249,7 @@ class AEPcounter:
                     output_line.append(0.0)
                 else:
                     output_line.append(line[self.heating_power_index]) # 7
-            output.append(output_line)
+            output.append(np.array(output_line))
         return np.array(output)
 
     def combine_timeseries(self, pow_alms1,stops,pow_alms2):
@@ -1405,6 +1410,7 @@ class AEPcounter:
             if ips_on is not None:
                 ips_on_sums = self.one_year_month_sums(ips_on_prod,year,1)
                 ice_detection_sums = self.one_year_month_sums(ice_detection_prod, year,1)
+                ips_consumption_sums = self.one_year_month_sums(ips_self_consumption,year,1)
             else:
                 print("Dummy IPS Values")
                 ips_on_sums = np.copy(theoretical_production_sums)
@@ -1435,6 +1441,6 @@ class AEPcounter:
                      actual_production_sums[index, 1],
                      theoretical_production_sums[index, 1] - actual_production_sums[index, 1], reldiff,
                      iced_power_sums[index, 1], icediff, ice_stop_sums[index, 1], stopdiff, status_stop_sums[index, 1],
-                     statusdiff, ips_on_sums[index,1], ipsdiff, ice_detection_sums[index, 1], iddiff,ice_loss, total_icediff, ips_self_consumption])
+                     statusdiff, ips_on_sums[index,1], ipsdiff, ice_detection_sums[index, 1], iddiff,ice_loss, total_icediff, ips_consumption_sums[index,1]])
         return np.array(production_statistics)
 

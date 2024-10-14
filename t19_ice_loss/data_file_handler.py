@@ -79,6 +79,11 @@ class CSVimporter:
             fault_column_string = config.get('Source file','fault columns')
             self.fault_columns = [int(column_index) for column_index in fault_column_string.split(',')]
             self.replace_faults = config.getboolean('Source file','replace fault codes',fallback=False)
+            skip_column_string = config.get('Source file','Skip columns')
+            if skip_column_string == "NONE":
+                self.skip_columns = []
+            else:
+                self.skip_columns = [int(column_index) for column_index in skip_column_string.split(',')]
             self.result_dir = config.get('Output','result directory',fallback='.')
             self.summaryfile_write = config.getboolean('Output', 'summary', fallback=True)
             self.pc_plot_picture = config.getboolean('Output', 'plot', fallback=True)
@@ -256,7 +261,9 @@ class CSVimporter:
                 dataline = next(inputdata)
                 outputline = []                
                 for i in range(0,len(dataline)):
-                    if i == self.timestamp_index:
+                    if i in self.skip_columns:
+                        outputline.append(np.nan)
+                    elif i == self.timestamp_index:
                         ts_string = dataline[self.timestamp_index]
                         if self.dt_extra_char == 0:
                             ts = datetime.datetime.strptime(ts_string,self.dt_format)
@@ -395,9 +402,9 @@ class Result_file_writer():
         :return:  status of writing, error
         
         """
-    #    headers = ['start', 'stop', 'loss', 'duration', 'mean power drop', 'mean_power', 'mean_reference_power',
-    #               'mean wind speed', 'mean temperature']
-        headers = ['Event start', 'Event stop', 'loss [kWh]', 'duration [h]']
+        headers = ['start', 'stop', 'loss', 'duration', 'mean power drop', 'mean_power', 'mean_reference_power',
+                  'mean wind speed', 'mean temperature']
+        # headers = ['Event start', 'Event stop', 'loss [kWh]', 'duration [h]']
         try:
             with open(result_filepath, 'w', newline='') as result_file:
                 writer = csv.writer(result_file, delimiter=';')
@@ -789,7 +796,7 @@ class Result_file_writer():
         else:
             icing_loss_production = np.nansum(alarm_timings[:, 2])
             icing_duration = np.nansum(alarm_timings[:, 3])
-        icing_loss_perc = (icing_loss_production/theoretical_production_sum) * 100.0
+        icing_loss_perc = (icing_loss_production/actual_production_sum) * 100.0
         #check for empty array (no stops)
         if np.shape(stop_timings) == (0,):
             stop_losses = 0.0
@@ -797,7 +804,7 @@ class Result_file_writer():
         else:
             stop_losses  = np.nansum(stop_timings[:, 2])
             stop_duration = np.nansum(stop_timings[:, 3])
-        stop_loss_perc = (stop_losses/theoretical_production_sum) * 100.0
+        stop_loss_perc = (stop_losses/actual_production_sum) * 100.0
         icing_duration_perc = (icing_duration / data_period) * 100.0
         stop_duration_perc = (stop_duration / data_period) * 100.0
         # check for empty

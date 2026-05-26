@@ -4,6 +4,8 @@
 
 A standardized method to assess production losses due to icing from wind turbine SCADA data. This site describes a method to assess production losses due to icing based on standard SCADA data available from modern wind turbines.
 
+**Note: A new version of this tool is being develped at:** https://github.com/IEAColdClimateWind/IceLossMethod 
+
 # Motivation
 
 Production losses due to wind turbine rotor icing are calculated with different methods, all resulting in different results. Task 19 has three main reasons why a standardized production loss calculation method is needed:
